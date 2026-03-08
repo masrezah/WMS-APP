@@ -1,0 +1,32 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  status    String   @default("active")
+  batches   InventoryBatch[]
+}
+
+model InventoryBatch {
+  id              String   @id @default(uuid())
+  tenant_id       String   // Wajib untuk isolasi data antar klien
+  product_id      String
+  quantity        Int
+  entry_date      DateTime @default(now()) // Mesin untuk FIFO/LIFO
+  expiry_date     DateTime?                // Mesin untuk FEFO
+  cost_per_unit   Decimal                  // Untuk perhitungan AVG/BPP
+  location_id     String                   // Racking/Palleting
+  
+  tenant          Tenant   @relation(fields: [tenant_id], references: [id])
+
+  @@index([tenant_id])
+}
