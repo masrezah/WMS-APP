@@ -1,0 +1,115 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // URL koneksi sekarang diatur otomatis melalui prisma.config.ts
+}
+
+// 1. Tabel Tenants (Data Perusahaan Klien)
+model Tenant {
+  id              String            @id @default(uuid())
+  name            String
+  status          String            @default("active")
+  
+  // Relasi ke tabel lain (One-to-Many)
+  users           User[]
+  products        Product[]
+  warehouses      Warehouse[]
+  batches         InventoryBatch[]
+  transactions    TransactionLog[]
+}
+
+// 2. Tabel Users & Roles (Akun Staf & Akses)
+model User {
+  id              String   @id @default(uuid())
+  tenant_id       String
+  name            String
+  email           String   @unique
+  password        String
+  role            String   // Contoh: 'Super Admin', 'Tenant Admin', 'Operator'
+  
+  tenant          Tenant   @relation(fields: [tenant_id], references: [id])
+
+  @@index([tenant_id])
+}
+
+// 3. Tabel Products (Master Barang/SKU)
+model Product {
+  id              String   @id @default(uuid())
+  tenant_id       String
+  sku             String
+  name            String
+  category        String   // Contoh: 'Raw Material', 'WIP', 'Finished Good'
+  
+  tenant          Tenant   @relation(fields: [tenant_id], references: [id])
+  batches         InventoryBatch[]
+  transactions    TransactionLog[]
+
+  @@index([tenant_id])
+}
+
+// 4. Tabel Warehouses (Data Fisik Gudang)
+model Warehouse {
+  id              String   @id @default(uuid())
+  tenant_id       String
+  name            String
+  warehouse_type  String   // Contoh: 'Public', 'Private', 'Contract'
+  layout_type     String   // Contoh: 'U Shape', 'L Shape', 'Garis Lurus'
+  
+  tenant          Tenant   @relation(fields: [tenant_id], references: [id])
+  locations       Location[]
+
+  @@index([tenant_id])
+}
+
+// 5. Tabel Locations (Area Racking/Palleting)
+model Location {
+  id              String   @id @default(uuid())
+  warehouse_id    String
+  code_name       String   // Contoh: 'A1-01'
+  type            String   // Contoh: 'Racking', 'Palleting'
+  
+  warehouse       Warehouse @relation(fields: [warehouse_id], references: [id])
+  batches         InventoryBatch[]
+
+  @@index([warehouse_id])
+}
+
+// 6. Tabel Inventory_Batches (Penyimpanan Detail Stok - FIFO/FEFO/LIFO/AVG)
+model InventoryBatch {
+  id              String   @id @default(uuid())
+  tenant_id       String
+  product_id      String
+  location_id     String
+  quantity        Int
+  entry_date      DateTime @default(now())
+  expiry_date     DateTime?
+  cost_per_unit   Decimal
+
+  tenant          Tenant   @relation(fields: [tenant_id], references: [id])
+  product         Product  @relation(fields: [product_id], references: [id])
+  location        Location @relation(fields: [location_id], references: [id])
+
+  @@index([tenant_id])
+  @@index([product_id])
+}
+
+// 7. Tabel Transactions_Log (Dokumentasi Riwayat Masuk-Keluar)
+model TransactionLog {
+  id              String   @id @default(uuid())
+  tenant_id       String
+  product_id      String
+  transaction_type String  // Contoh: 'IN' (Masuk), 'OUT' (Keluar)
+  quantity        Int
+  transaction_date DateTime @default(now())
+  note            String?  // Catatan opsional (misal: ID Order / DO)
+
+  tenant          Tenant   @relation(fields: [tenant_id], references: [id])
+  product         Product  @relation(fields: [product_id], references: [id])
+
+  @@index([tenant_id])
+}
