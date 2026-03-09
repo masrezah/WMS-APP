@@ -6,6 +6,8 @@ import { InboundModule } from './modules/inbound/inbound.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { OutboundModule } from './modules/outbound/outbound.module';
 import { PrismaModule } from './prisma/prisma.module'; // <-- Tambahkan ini
+import { AuthModule } from './modules/auth/auth.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -13,7 +15,7 @@ import { PrismaModule } from './prisma/prisma.module'; // <-- Tambahkan ini
     TenantsModule, 
     InboundModule, 
     InventoryModule, 
-    OutboundModule
+    OutboundModule, AuthModule, UsersModule
   ],
   controllers: [AppController],
   providers: [AppService],

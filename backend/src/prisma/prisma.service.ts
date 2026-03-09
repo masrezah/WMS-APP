@@ -1,15 +1,26 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+  constructor() {
+    // 1. Buat koneksi (Pool) ke database menggunakan URL dari .env
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    
+    // 2. Bungkus koneksi tersebut ke dalam adapter Prisma
+    const adapter = new PrismaPg(pool);
+
+    // 3. Masukkan adapter ke dalam konfigurasi PrismaClient
+    super({ adapter });
+  }
+
   async onModuleInit() {
-    // Menghubungkan ke database saat aplikasi dinyalakan
     await this.$connect();
   }
 
   async onModuleDestroy() {
-    // Memutuskan koneksi saat aplikasi dimatikan
     await this.$disconnect();
   }
 }
