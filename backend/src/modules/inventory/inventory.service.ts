@@ -5,12 +5,11 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class InventoryService {
   constructor(private prisma: PrismaService) {}
 
-  // Fungsi untuk mengambil semua stok barang sesuai perusahaan (tenant)
+  // 1. Fungsi untuk mengambil semua stok barang sesuai perusahaan (tenant)
   async getStock(tenantId: string) {
-    const stocks = await this.prisma.inventoryBatch.findMany({
-      where: {
-        tenant_id: tenantId, // <--- KUNCI ISOLASI DATA
-      },
+    const db = this.prisma.withTenant(tenantId);
+
+    const stocks = await db.inventoryBatch.findMany({
       include: {
         product: true,  // Join ke tabel Product
         location: true, // Join ke tabel Location
@@ -20,6 +19,25 @@ export class InventoryService {
     return {
       message: 'Berhasil mengambil data stok',
       data: stocks,
+    };
+  }
+
+  // 2. Fungsi untuk mendaftarkan barang baru (Master Data Product)
+  async createProduct(tenantId: string, data: any) {
+    const db = this.prisma.withTenant(tenantId);
+
+    const newProduct = await db.product.create({
+      // Tambahkan 'as any' di sini buat nyuruh TypeScript tutup mulut
+      data: {
+        sku: data.sku,
+        name: data.name,
+        category: data.category, 
+      } as any, 
+    });
+
+    return {
+      message: 'Produk berhasil ditambahkan ke master data!',
+      data: newProduct,
     };
   }
 }
