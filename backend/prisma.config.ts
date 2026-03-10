@@ -1,13 +1,15 @@
-import { defineConfig } from '@prisma/config';
+import { defineConfig, env } from '@prisma/config';
 import * as dotenv from 'dotenv';
 
-// Paksa baca file .env dari sistem
+// Membaca file .env
 dotenv.config();
 
 export default defineConfig({
+  // Lokasi file schema kamu
   schema: './prisma/schema.prisma',
-  // @ts-ignore: Memaksa TypeScript mengabaikan error karena tipe datanya belum update
-  migrate: {
-    databaseUrl: process.env.DATABASE_URL,
+  
+  // Konfigurasi koneksi database untuk proses migrate
+  datasource: {
+    url: process.env.DATABASE_URL || env('DATABASE_URL'),
   },
 });

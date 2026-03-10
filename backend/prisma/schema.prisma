@@ -1,5 +1,3 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,11 +9,11 @@ datasource db {
 // --- ENUMS ---
 
 enum Role {
-  SUPER_ADMIN // Admin utama pembuat SaaS
-  TENANT_ADMIN // Manajer Gudang Klien
+  SUPER_ADMIN 
+  TENANT_ADMIN 
   PURCHASING
   RESOURCES
-  WAREHOUSE_OPERATOR // Area Operator Gudang
+  WAREHOUSE_OPERATOR 
   FINANCE
   PRODUCTION
   SHIPMENT
@@ -33,7 +31,7 @@ enum ProductCategory {
 enum TransactionType {
   INBOUND
   OUTBOUND
-  ADJUSTMENT // Untuk Stock Opname
+  ADJUSTMENT 
 }
 
 // --- MODELS ---
@@ -44,7 +42,6 @@ model Tenant {
   status     String   @default("active")
   created_at DateTime @default(now())
 
-  // Relasi ke tabel lain (One-to-Many)
   users        User[]
   products     Product[]
   warehouses   Warehouse[]
@@ -54,9 +51,9 @@ model Tenant {
 
 model User {
   id         String   @id @default(uuid())
-  tenant_id  String // Isolasi data antar klien
+  tenant_id  String 
   email      String   @unique
-  password   String // Akan di-hash pakai bcrypt
+  password   String 
   name       String
   role       Role     @default(WAREHOUSE_OPERATOR)
   created_at DateTime @default(now())
@@ -70,9 +67,10 @@ model User {
 model Product {
   id         String          @id @default(uuid())
   tenant_id  String
-  sku        String // Stock Keeping Unit / Kode Barang
+  sku        String 
   name       String
   category   ProductCategory
+  unit       String          // Pcs, Box, Kg, dll
   created_at DateTime        @default(now())
   updated_at DateTime        @updatedAt
 
@@ -80,18 +78,20 @@ model Product {
   batches      InventoryBatch[]
   transactions TransactionLog[]
 
-  @@unique([tenant_id, sku]) // SKU tidak boleh sama dalam 1 perusahaan
+  @@unique([tenant_id, sku]) 
   @@index([tenant_id])
 }
 
 model Warehouse {
-  id          String @id @default(uuid())
+  id          String     @id @default(uuid())
   tenant_id   String
   name        String
-  type        String @default("Private") // Public, Private, Contract, Multi Client
-  layout_type String @default("Garis Lurus Sederhana") // Garis Lurus, U Shape, L Shape, Random
+  type        String     @default("Private") 
+  method      String     @default("FIFO") 
+  layout_type String     @default("Garis Lurus Sederhana") 
+  address     String?    
 
-  tenant   Tenant     @relation(fields: [tenant_id], references: [id])
+  tenant    Tenant     @relation(fields: [tenant_id], references: [id])
   locations Location[]
 
   @@index([tenant_id])
@@ -100,22 +100,25 @@ model Warehouse {
 model Location {
   id           String @id @default(uuid())
   warehouse_id String
-  name         String // Contoh: Rak-A1-01, Pallet-B2
-  type         String // Racking atau Palleting
+  zone         String   // Zone A, Zone B
+  rack         String   // Baris Rak
+  shelf        String   // Level Rak
+  bin          String   // Kode Palet/Bin
 
   warehouse Warehouse        @relation(fields: [warehouse_id], references: [id])
   batches   InventoryBatch[]
 }
 
 model InventoryBatch {
-  id           String    @id @default(uuid())
-  tenant_id    String // Wajib untuk isolasi data antar klien
-  product_id   String
-  location_id  String // Racking/Palleting
-  quantity     Int
-  entry_date   DateTime  @default(now()) // Mesin untuk FIFO/LIFO
-  expiry_date  DateTime? // Mesin untuk FEFO
-  cost_per_unit Decimal // Untuk perhitungan AVG/BPP
+  id            String    @id @default(uuid())
+  tenant_id     String 
+  product_id    String
+  location_id   String 
+  quantity      Int
+  batch_no      String?   
+  entry_date    DateTime  @default(now()) 
+  expiry_date   DateTime? 
+  cost_per_unit Decimal 
 
   tenant       Tenant           @relation(fields: [tenant_id], references: [id])
   product      Product          @relation(fields: [product_id], references: [id])
@@ -132,8 +135,8 @@ model TransactionLog {
   product_id String
   batch_id   String?
   type       TransactionType
-  quantity   Int // Jumlah keluar/masuk/penyesuaian
-  notes      String? // Identitas DO, No. Resi, dll
+  quantity   Int 
+  notes      String? 
   created_at DateTime        @default(now())
 
   tenant  Tenant          @relation(fields: [tenant_id], references: [id])
