@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Query } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../auth/guards/get-user.decorator';
 import { InventoryService } from './inventory.service';
@@ -18,8 +18,18 @@ export class InventoryController {
   @Post('products')
   async createProduct(
     @GetUser('tenantId') tenantId: string, // Ambil ID perusahaan dari token
-    @Body() body: any // Ambil isi paket JSON dari Postman
+    @Body() body: any, // Ambil isi paket JSON dari Postman
   ) {
     return this.inventoryService.createProduct(tenantId, body);
+  }
+
+  // 3. PINTU BARU: Buat baca daftar produk (GET http://localhost:3000/inventory/products)
+  @Get('products')
+  async getProducts(
+    @GetUser('tenantId') tenantId: string,
+    @Query('search') search?: string,
+    @Query('category') category?: string,
+  ) {
+    return this.inventoryService.getProducts(tenantId, search, category);
   }
 }

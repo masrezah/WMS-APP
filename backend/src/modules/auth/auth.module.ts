@@ -11,8 +11,8 @@ import { JwtStrategy } from './jwt.strategy';
     UsersModule,
     PassportModule,
     JwtModule.register({
-      secret: 'rahasia-wms-saas-super-aman', // Samakan dengan yang di jwt.strategy.ts
-      signOptions: { expiresIn: '1d' }, // Token valid untuk 1 hari
+      secret: process.env.JWT_SECRET || 'rahasia-wms-saas-super-aman', 
+      signOptions: { expiresIn: '1d' }, 
     }),
   ],
   controllers: [AuthController],

@@ -1,4 +1,11 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -10,13 +17,15 @@ export class AuthController {
   async register(@Body() body: any) {
     // Validasi input sederhana (Nanti bisa diganti pakai DTO & class-validator)
     if (!body.tenantName || !body.userName || !body.email || !body.password) {
-      throw new UnauthorizedException('Semua field (tenantName, userName, email, password) wajib diisi!');
+      throw new UnauthorizedException(
+        'Semua field (tenantName, userName, email, password) wajib diisi!',
+      );
     }
-    
+
     const result = await this.authService.register(body);
     return {
       message: 'Registrasi Perusahaan & Admin berhasil',
-      data: result
+      data: result,
     };
   }
 
@@ -30,7 +39,7 @@ export class AuthController {
 
     // Panggil fungsi validasi
     const user = await this.authService.validateUser(body.email, body.password);
-    
+
     if (!user) {
       throw new UnauthorizedException('Email atau password salah!');
     }

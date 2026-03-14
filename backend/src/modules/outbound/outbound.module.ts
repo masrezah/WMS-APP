@@ -4,6 +4,6 @@ import { OutboundService } from './outbound.service';
 
 @Module({
   controllers: [OutboundController],
-  providers: [OutboundService]
+  providers: [OutboundService],
 })
 export class OutboundModule {}

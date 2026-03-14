@@ -2,17 +2,26 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useStore } from "@/store/useStore";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const setIsAuthenticated = useStore((state) => state.setIsAuthenticated);
+  const isOnboarded = useStore((state) => state.isOnboarded);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (email && password) {
+      setIsAuthenticated(true);
       toast.success("Login berhasil!");
-      router.push("/onboarding");
+      
+      if (isOnboarded) {
+        router.push("/dashboard");
+      } else {
+        router.push("/onboarding");
+      }
     } else {
       toast.error("Gagal! Mohon isi email dan password.");
     }

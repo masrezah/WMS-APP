@@ -1,10 +1,46 @@
 "use client";
+import { useState } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { WmsService } from "@/services/wms.service";
+import { useMutation } from "@tanstack/react-query";
 
 export default function PutAwayPage() {
+  const [productId, setProductId] = useState("");
+  const [locationId, setLocationId] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [batchNo, setBatchNo] = useState("");
+  const [costPerUnit, setCostPerUnit] = useState("");
+
+  const putAwayMutation = useMutation({
+    mutationFn: WmsService.putAway,
+    onSuccess: () => {
+      toast.success("Barang berhasil diletakkan di rak!");
+      setProductId("");
+      setLocationId("");
+      setQuantity("");
+      setBatchNo("");
+      setCostPerUnit("");
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || error.message || "Gagal put-away");
+    }
+  });
+
   const handleConfirm = () => {
-    toast.success("Barang berhasil diletakkan di rak!");
+    if (!productId || !locationId || !quantity || !costPerUnit) {
+      toast.error("Semua field wajib diisi");
+      return;
+    }
+    const tenant_id = localStorage.getItem("tenant_id") || "T-001";
+    putAwayMutation.mutate({
+      tenant_id,
+      product_id: productId,
+      location_id: locationId,
+      quantity: Number(quantity),
+      batch_no: batchNo,
+      cost_per_unit: Number(costPerUnit)
+    });
   };
 
   return (
@@ -18,38 +54,45 @@ export default function PutAwayPage() {
       
       <div className="p-4 flex-1 space-y-4 overflow-auto">
         {/* Scanner Input Area */}
-        <div className="bg-white p-4 rounded-xl shadow-sm border-2 border-dashed border-blue-300 text-center">
-          <p className="text-sm font-semibold text-gray-600 mb-2">Scan Barcode Pallet / Rak</p>
+        <div className="bg-white p-4 rounded-xl shadow-sm border-2 border-dashed border-blue-300 text-center space-y-3">
+          <p className="text-sm font-semibold text-gray-600">Form Put-Away</p>
+          <input 
+            type="text" 
+            value={productId}
+            onChange={(e) => setProductId(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-lg text-sm" 
+            placeholder="Product ID (UUID)" 
+          />
+          <input 
+            type="text" 
+            value={locationId}
+            onChange={(e) => setLocationId(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-lg text-sm" 
+            placeholder="Target Location ID (UUID)" 
+          />
           <div className="flex gap-2">
             <input 
-              type="text" 
-              className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-mono text-center text-lg" 
-              placeholder="|| |||| ||||| ||" 
-              autoFocus 
+              type="number" 
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              className="flex-1 p-2 border border-gray-300 rounded-lg text-sm" 
+              placeholder="Qty" 
             />
-            <button className="bg-blue-100 px-4 rounded-lg text-blue-700 text-xl border border-blue-200">
-              📷
-            </button>
+            <input 
+              type="number" 
+              value={costPerUnit}
+              onChange={(e) => setCostPerUnit(e.target.value)}
+              className="flex-1 p-2 border border-gray-300 rounded-lg text-sm" 
+              placeholder="Cost/Unit" 
+            />
           </div>
-        </div>
-
-        {/* Task Card */}
-        <div className="bg-yellow-50 border-2 border-yellow-400 p-5 rounded-xl shadow-sm relative overflow-hidden">
-          <div className="absolute top-0 right-0 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-bl-lg">
-            PUT-AWAY TASK
-          </div>
-          <h3 className="font-bold text-gray-800 mt-2">Kardus Packing Medium</h3>
-          <p className="text-xs text-gray-500 mb-3">SKU-1001</p>
-          
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-sm text-gray-600 font-medium">Qty: <span className="text-lg font-black text-gray-800">500 Pcs</span></span>
-            <span className="text-xs bg-gray-200 px-2 py-1 rounded text-gray-700 font-bold">Pallet P-092</span>
-          </div>
-
-          <div className="bg-white p-4 rounded-lg border border-yellow-200 text-center shadow-inner">
-            <p className="text-xs text-gray-500 uppercase tracking-widest font-bold mb-1">Target Lokasi (Bin)</p>
-            <p className="text-4xl font-black text-blue-700 tracking-wider">A-01-R2-L1</p>
-          </div>
+          <input 
+            type="text" 
+            value={batchNo}
+            onChange={(e) => setBatchNo(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-lg text-sm" 
+            placeholder="Batch No (Opsional)" 
+          />
         </div>
       </div>
 
@@ -57,9 +100,10 @@ export default function PutAwayPage() {
       <div className="p-4 bg-white border-t border-gray-200">
         <button 
           onClick={handleConfirm} 
-          className="w-full py-4 bg-green-600 text-white font-black text-lg rounded-xl shadow-lg hover:bg-green-700 active:scale-95 transition flex justify-center items-center gap-2"
+          disabled={putAwayMutation.isPending}
+          className="w-full py-4 bg-green-600 text-white font-black text-lg rounded-xl shadow-lg hover:bg-green-700 active:scale-95 transition flex justify-center items-center gap-2 disabled:opacity-50"
         >
-          ✓ KONFIRMASI LOKASI
+          {putAwayMutation.isPending ? "Menyimpan..." : "✓ KONFIRMASI LOKASI"}
         </button>
       </div>
     </div>

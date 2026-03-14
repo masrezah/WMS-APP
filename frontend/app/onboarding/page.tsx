@@ -7,15 +7,16 @@ import { useStore } from "@/store/useStore";
 export default function OnboardingPage() {
   const [warehouseName, setWarehouseName] = useState("");
   const setTenantName = useStore((state) => state.setTenantName);
+  const setIsOnboarded = useStore((state) => state.setIsOnboarded);
   const router = useRouter();
 
   const handleSetup = (e: React.FormEvent) => {
     e.preventDefault();
     if (warehouseName) {
       setTenantName(warehouseName);
+      setIsOnboarded(true);
       toast.success(`Gudang "${warehouseName}" berhasil disetup!`);
-      // Nanti ganti path ini ke "/dashboard" saat masuk Sprint Dashboard
-      router.push("/"); 
+      router.push("/dashboard"); 
     } else {
       toast.error("Nama gudang tidak boleh kosong.");
     }

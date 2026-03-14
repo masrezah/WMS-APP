@@ -14,7 +14,12 @@ export class UsersService {
   }
 
   // Fungsi untuk Register (Bikin Perusahaan + Akun Adminnya)
-  async createTenantAndUser(tenantName: string, userName: string, email: string, passwordPlain: string) {
+  async createTenantAndUser(
+    tenantName: string,
+    userName: string,
+    email: string,
+    passwordPlain: string,
+  ) {
     // 1. Hash password biar aman (tidak teks telanjang di database)
     const hashedPassword = await bcrypt.hash(passwordPlain, 10);
 

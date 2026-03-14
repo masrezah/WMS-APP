@@ -7,16 +7,16 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   // 1. Fungsi Validasi User (Cek Email & Password)
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
-    
-    if (user && await bcrypt.compare(pass, user.password)) {
+
+    if (user && (await bcrypt.compare(pass, user.password))) {
       // Buang properti password dari object yang di-return demi keamanan
-      const { password, ...result } = user; 
+      const { password, ...result } = user;
       return result;
     }
     return null;
@@ -29,9 +29,9 @@ export class AuthService {
       sub: user.id,
       email: user.email,
       role: user.role,
-      tenantId: user.tenant_id // Info krusial untuk Blueprint SaaS
+      tenantId: user.tenant_id, // Info krusial untuk Blueprint SaaS
     };
-    
+
     return {
       access_token: this.jwtService.sign(payload),
       user: {
@@ -39,8 +39,8 @@ export class AuthService {
         name: user.name,
         email: user.email,
         role: user.role,
-        tenant_id: user.tenant_id
-      }
+        tenant_id: user.tenant_id,
+      },
     };
   }
 
@@ -56,7 +56,7 @@ export class AuthService {
       registerDto.tenantName,
       registerDto.userName,
       registerDto.email,
-      registerDto.password
+      registerDto.password,
     );
   }
 }

@@ -4,6 +4,6 @@ import { InboundService } from './inbound.service';
 
 @Module({
   controllers: [InboundController],
-  providers: [InboundService]
+  providers: [InboundService],
 })
 export class InboundModule {}

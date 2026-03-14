@@ -10,6 +10,7 @@ import { InventoryModule } from './modules/inventory/inventory.module'; // Pasti
 import { TenantsModule } from './modules/tenants/tenants.module';
 import { InboundModule } from './modules/inbound/inbound.module';
 import { OutboundModule } from './modules/outbound/outbound.module';
+import { WmsModule } from './modules/wms/wms.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { OutboundModule } from './modules/outbound/outbound.module';
     TenantsModule,      // TenantsModule
     InboundModule,      // InboundModule
     OutboundModule,     // OutboundModule
+    WmsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
