@@ -1,0 +1,24 @@
+
+> frontend@0.1.0 build
+> next build
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 10.7s
+  Running TypeScript ...
+Failed to compile.
+
+./components/layout/top-nav.tsx:61:40
+Type error: Argument of type '"operator" | "admin"' is not assignable to parameter of type 'AppRole'.
+  Type '"operator"' is not assignable to type 'AppRole'.
+
+  59 |             <select
+  60 |               value={role}
+> 61 |               onChange={(e) => setRole(e.target.value as "admin" | "operator")}
+     |                                        ^
+  62 |               className="h-8 rounded-md border border-gray-200 bg-white px-2 text-xs font-semibold text-gray-700 shadow-sm outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-300 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300"
+  63 |             >
+  64 |               <option value="admin">Admin</option>
+Next.js build worker exited with code: 1 and signal: null

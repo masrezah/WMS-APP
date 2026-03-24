@@ -1,6 +1,6 @@
 "use client";
 
-import { useStore } from "@/store/useStore";
+import { useStore, AppRole } from "@/store/useStore";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Search, Sun, Moon } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -58,17 +58,20 @@ export function TopNav() {
             <span className="text-sm font-bold text-blue-700 dark:text-blue-400">{tenantName}</span>
             <select
               value={role}
-              onChange={(e) => setRole(e.target.value as "admin" | "operator")}
+              onChange={(e) => setRole(e.target.value as AppRole)}
               className="h-8 rounded-md border border-gray-200 bg-white px-2 text-xs font-semibold text-gray-700 shadow-sm outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-300 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300"
             >
-              <option value="admin">Admin</option>
-              <option value="operator">Operator</option>
+              <option value="SUPER_ADMIN">Super Admin</option>
+              <option value="TENANT_ADMIN">Tenant Admin</option>
+              <option value="WAREHOUSE_OPERATOR">Tim Gudang</option>
+              <option value="PURCHASING">Purchasing</option>
+              <option value="SHIPMENT">Shipment</option>
             </select>
           </div>
           <span className="mt-0.5 text-[11px] text-gray-500 font-medium dark:text-zinc-500">Role Simulator</span>
         </div>
-        <div className="h-10 w-10 shrink-0 rounded-full bg-gray-100 border-2 border-blue-500 flex items-center justify-center font-extrabold text-blue-700 dark:bg-zinc-800 dark:border-blue-700 dark:text-blue-400">
-          {role === "admin" ? "A" : "O"}
+        <div className="h-10 w-10 shrink-0 rounded-full bg-gray-100 border-2 border-blue-500 flex items-center justify-center font-extrabold text-blue-700 dark:bg-zinc-800 dark:border-blue-700 dark:text-blue-400 text-xs">
+          {role?.substring(0, 2).toUpperCase() || "TA"}
         </div>
       </div>
     </header>
