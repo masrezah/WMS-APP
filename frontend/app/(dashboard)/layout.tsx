@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/store/useStore";
-import { Sidebar } from "@/components/layout/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 import { TopNav } from "@/components/layout/top-nav";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -30,14 +31,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <TopNav />
-        <main className="p-6 flex-1 overflow-auto">
-          {children}
-        </main>
-      </div>
-    </div>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <div className="flex-1 flex flex-col min-w-0 bg-gray-50 dark:bg-zinc-950">
+          <TopNav />
+          <main className="p-6 flex-1 overflow-auto">
+            {children}
+          </main>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

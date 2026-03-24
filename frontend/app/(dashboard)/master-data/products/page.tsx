@@ -48,13 +48,13 @@ export default function ProductsPage() {
   const getCategoryBadge = (cat: string) => {
     switch (cat.toLowerCase()) {
       case "raw material":
-        return <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs font-medium">Raw Material</span>;
+        return <span className="bg-orange-100 text-orange-800 dark:bg-orange-500/10 dark:text-orange-400 px-2 py-1 rounded text-xs font-medium">Raw Material</span>;
       case "finished good":
-        return <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">Finished Good</span>;
+        return <span className="bg-green-100 text-green-800 dark:bg-emerald-500/10 dark:text-emerald-400 px-2 py-1 rounded text-xs font-medium">Finished Good</span>;
       case "packaging":
-        return <span className="bg-gray-200 text-gray-800 px-2 py-1 rounded text-xs font-medium">Packaging</span>;
+        return <span className="bg-gray-200 text-gray-800 dark:bg-zinc-800 dark:text-zinc-300 px-2 py-1 rounded text-xs font-medium">Packaging</span>;
       default:
-        return <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">{cat}</span>;
+        return <span className="bg-blue-100 text-blue-800 dark:bg-blue-500/10 dark:text-blue-400 px-2 py-1 rounded text-xs font-medium">{cat}</span>;
     }
   };
 
@@ -62,8 +62,8 @@ export default function ProductsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Master Produk</h1>
-          <p className="text-gray-500 text-sm">Kelola semua data barang dan SKU Anda di sini.</p>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-zinc-50">Master Produk</h1>
+          <p className="text-gray-500 dark:text-zinc-400 text-sm">Kelola semua data barang dan SKU Anda di sini.</p>
         </div>
         <Link 
           href="/master-data/products/add" 
@@ -73,19 +73,19 @@ export default function ProductsPage() {
         </Link>
       </div>
 
-      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white dark:bg-zinc-950 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800">
         <div className="flex flex-col sm:flex-row gap-4 mb-4">
           <input 
             type="text" 
             placeholder="Cari SKU atau nama produk..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 p-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
+            className="flex-1 p-2 border border-gray-300 dark:border-zinc-700 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 outline-none dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500"
           />
           <select 
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="p-2 border border-gray-300 rounded-md text-sm bg-white outline-none focus:ring-blue-500 focus:border-blue-500 min-w-[180px]"
+            className="p-2 border border-gray-300 dark:border-zinc-700 rounded-md text-sm bg-white dark:bg-zinc-900 dark:text-zinc-100 outline-none focus:ring-blue-500 focus:border-blue-500 min-w-[180px]"
           >
             <option value="">Semua Kategori</option>
             <option value="Raw Material">Raw Material</option>
@@ -94,9 +94,9 @@ export default function ProductsPage() {
           </select>
         </div>
         
-        <div className="overflow-x-auto rounded-md border border-gray-200">
+        <div className="overflow-x-auto rounded-md border border-gray-200 dark:border-zinc-800">
           <table className="w-full text-sm text-left">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
+            <thead className="text-xs text-gray-700 dark:text-zinc-400 uppercase bg-gray-50 dark:bg-zinc-900/50 border-b border-gray-200 dark:border-zinc-800">
               <tr>
                 <th className="px-4 py-3 font-semibold">SKU / Barcode</th>
                 <th className="px-4 py-3 font-semibold">Nama Produk</th>
@@ -105,7 +105,7 @@ export default function ProductsPage() {
                 <th className="px-4 py-3 font-semibold text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
               {isLoading ? (
                 <tr>
                   <td colSpan={5} className="px-4 py-12 text-center">
@@ -132,11 +132,11 @@ export default function ProductsPage() {
                 </tr>
               ) : (
                 products?.map((product) => (
-                  <tr key={product.id} className="bg-white hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-gray-900">{product.sku}</td>
-                    <td className="px-4 py-3 text-gray-700">{product.name}</td>
+                  <tr key={product.id} className="bg-white dark:bg-zinc-950 hover:bg-gray-50 dark:hover:bg-zinc-900/50 transition-colors">
+                    <td className="px-4 py-3 font-medium text-gray-900 dark:text-zinc-100">{product.sku}</td>
+                    <td className="px-4 py-3 text-gray-700 dark:text-zinc-300">{product.name}</td>
                     <td className="px-4 py-3">{getCategoryBadge(product.category)}</td>
-                    <td className="px-4 py-3 text-gray-700">{formatPrice(product.price)}</td>
+                    <td className="px-4 py-3 text-gray-700 dark:text-zinc-300">{formatPrice(product.price)}</td>
                     <td className="px-4 py-3 text-right">
                       <button 
                         onClick={() => toast.info(`Fitur edit untuk ${product.sku} segera hadir!`)}
@@ -152,15 +152,15 @@ export default function ProductsPage() {
           </table>
         </div>
         
-        <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
+        <div className="flex justify-between items-center mt-4 text-sm text-gray-500 dark:text-zinc-400">
           <span>
             {products ? `Menampilkan ${products.length} produk` : 'Menampilkan 0 produk'}
           </span>
           <div className="flex gap-2">
-            <button className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" disabled>
+            <button className="px-3 py-1 border border-gray-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" disabled>
               Sebelumnya
             </button>
-            <button className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" disabled>
+            <button className="px-3 py-1 border border-gray-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" disabled>
               Selanjutnya
             </button>
           </div>

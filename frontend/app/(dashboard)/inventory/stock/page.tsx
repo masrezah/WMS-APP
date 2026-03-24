@@ -40,8 +40,8 @@ export default function StockPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Stok Real-time</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-zinc-50">Stok Real-time</h1>
+          <p className="mt-1 text-sm text-gray-600 dark:text-zinc-400">
             Pantau ketersediaan barang di seluruh lokasi gudang beserta batch dan masa kedaluwarsanya.
           </p>
         </div>
@@ -49,9 +49,9 @@ export default function StockPage() {
         <div className="flex flex-col gap-2 sm:flex-row">
           <button
             type="button"
-            className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
+            className="inline-flex items-center justify-center rounded-lg border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-2 text-sm font-semibold text-gray-800 dark:text-zinc-100 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
           >
-            <svg viewBox="0 0 20 20" fill="currentColor" className="mr-2 size-4 text-gray-400">
+            <svg viewBox="0 0 20 20" fill="currentColor" className="mr-2 size-4 text-gray-400 dark:text-zinc-500">
               <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
             </svg>
             Filter
@@ -65,17 +65,17 @@ export default function StockPage() {
         </div>
       </div>
 
-      <section className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <div className="border-b border-gray-200 px-4 py-3">
+      <section className="overflow-hidden rounded-lg border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+        <div className="border-b border-gray-200 dark:border-zinc-800 px-4 py-3">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-sm font-semibold text-gray-900">Daftar Inventori</h2>
-            <p className="text-xs text-gray-600">{stockData.length} item ditemukan</p>
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-zinc-100">Daftar Inventori</h2>
+            <p className="text-xs text-gray-600 dark:text-zinc-400">{stockData.length} item ditemukan</p>
           </div>
         </div>
 
         <div className="w-full overflow-x-auto">
           <table className="min-w-245 w-full text-left text-sm">
-            <thead className="bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-600">
+            <thead className="bg-gray-50 dark:bg-zinc-900/50 text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-zinc-400 border-b border-gray-200 dark:border-zinc-800">
               <tr>
                 <th className="px-4 py-3">SKU / Nama Item</th>
                 <th className="px-4 py-3">Lokasi (Bin)</th>
@@ -84,7 +84,7 @@ export default function StockPage() {
                 <th className="px-4 py-3">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
               {isLoading ? (
                 <tr>
                   <td colSpan={5} className="px-4 py-12 text-center">
@@ -108,23 +108,23 @@ export default function StockPage() {
                   </td>
                 </tr>
               ) : stockData.map((row) => (
-                <tr key={row.id} className="bg-white hover:bg-gray-50">
+                <tr key={row.id} className="bg-white hover:bg-gray-50 dark:bg-zinc-950 dark:hover:bg-zinc-900 transition-colors">
                   <td className="px-4 py-3">
-                    <div className="font-semibold text-gray-900">{row.sku}</div>
-                    <div className="text-xs text-gray-600">{row.name}</div>
+                    <div className="font-semibold text-gray-900 dark:text-zinc-100">{row.sku}</div>
+                    <div className="text-xs text-gray-600 dark:text-zinc-400">{row.name}</div>
                   </td>
-                  <td className="px-4 py-3 text-gray-800">{row.bin}</td>
-                  <td className="px-4 py-3 text-gray-600">{row.batchExp}</td>
-                  <td className="px-4 py-3 text-right font-semibold text-gray-900">
+                  <td className="px-4 py-3 text-gray-800 dark:text-zinc-300">{row.bin}</td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-zinc-400">{row.batchExp}</td>
+                  <td className="px-4 py-3 text-right font-semibold text-gray-900 dark:text-zinc-100">
                     {row.available.toLocaleString("id-ID")}
                   </td>
                   <td className="px-4 py-3">
                     {row.status === "Aman" ? (
-                      <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-200">
+                      <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20">
                         {row.status}
                       </span>
                     ) : (
-                      <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs font-semibold text-red-700 ring-1 ring-inset ring-red-200">
+                      <span className="inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-[10px] font-semibold text-red-700 ring-1 ring-inset ring-red-200 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/20">
                         {row.status}
                       </span>
                     )}

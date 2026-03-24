@@ -1,7 +1,15 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type AppRole = 'admin' | 'operator';
+export type AppRole = 
+  | 'SUPER_ADMIN' 
+  | 'TENANT_ADMIN' 
+  | 'PURCHASING'
+  | 'RESOURCES'
+  | 'WAREHOUSE_OPERATOR' 
+  | 'FINANCE'
+  | 'PRODUCTION'
+  | 'SHIPMENT';
 
 interface AppState {
   tenantName: string | null;
@@ -13,6 +21,8 @@ interface AppState {
   isOnboarded: boolean;
   setIsOnboarded: (onboarded: boolean) => void;
   logout: () => void;
+  activeModules: string[];
+  toggleAddon: (id: string) => void;
 }
 
 export const useStore = create<AppState>()(
@@ -20,7 +30,7 @@ export const useStore = create<AppState>()(
     (set) => ({
       tenantName: null,
       setTenantName: (name) => set({ tenantName: name }),
-      role: 'admin',
+      role: 'TENANT_ADMIN', // Defaulting to Tenant Admin for demonstration
       setRole: (role) => set({ role }),
       isAuthenticated: false,
       setIsAuthenticated: (auth) => set({ isAuthenticated: auth }),
@@ -30,8 +40,15 @@ export const useStore = create<AppState>()(
         isAuthenticated: false, 
         isOnboarded: false, 
         tenantName: null, 
-        role: 'admin' 
+        role: 'TENANT_ADMIN',
+        activeModules: ['inventory-valuation']
       }),
+      activeModules: ['inventory-valuation'],
+      toggleAddon: (id) => set((state) => ({
+        activeModules: state.activeModules.includes(id)
+          ? state.activeModules.filter(modId => modId !== id)
+          : [...state.activeModules, id]
+      })),
     }),
     {
       name: 'wms-storage',

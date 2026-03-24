@@ -12,6 +12,10 @@ import { InboundModule } from './modules/inbound/inbound.module';
 import { OutboundModule } from './modules/outbound/outbound.module';
 import { WmsModule } from './modules/wms/wms.module';
 
+// Add-ons
+import { InventoryValuationModule } from './addons/inventory-valuation/inventory-valuation.module';
+import { LayoutRoutingModule } from './addons/layout-routing/layout-routing.module';
+
 @Module({
   imports: [
     PrismaModule,       // PrismaModule ditambahkan pertama
@@ -22,6 +26,8 @@ import { WmsModule } from './modules/wms/wms.module';
     InboundModule,      // InboundModule
     OutboundModule,     // OutboundModule
     WmsModule,
+    InventoryValuationModule, // Add-ons
+    LayoutRoutingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

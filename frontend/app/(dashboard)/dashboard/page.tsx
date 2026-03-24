@@ -1,3 +1,13 @@
+import { DashboardChart } from "@/components/dashboard-chart"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { ArrowDownToLine, ArrowUpFromLine, Box } from "lucide-react"
+
 type Trend = "up" | "down"
 
 type SummaryCard = {
@@ -30,8 +40,8 @@ const summaryCards: SummaryCard[] = [
     trend: "up",
     trendLabel: "+5% dari minggu lalu",
     icon: (
-      <div className="flex size-10 items-center justify-center rounded-lg bg-sky-50 ring-1 ring-inset ring-sky-200">
-        <svg viewBox="0 0 24 24" className="size-5 text-sky-700" fill="none" stroke="currentColor" strokeWidth="2">
+      <div className="flex size-10 items-center justify-center rounded-lg bg-sky-50 ring-1 ring-inset ring-sky-200 dark:bg-sky-500/10 dark:ring-sky-500/20">
+        <svg viewBox="0 0 24 24" className="size-5 text-sky-700 dark:text-sky-400" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M4 7h16M4 12h16M4 17h10" />
         </svg>
       </div>
@@ -43,8 +53,8 @@ const summaryCards: SummaryCard[] = [
     trend: "up",
     trendLabel: "+12% dari minggu lalu",
     icon: (
-      <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-50 ring-1 ring-inset ring-emerald-200">
-        <svg viewBox="0 0 24 24" className="size-5 text-emerald-700" fill="none" stroke="currentColor" strokeWidth="2">
+      <div className="flex size-10 items-center justify-center rounded-lg bg-emerald-50 ring-1 ring-inset ring-emerald-200 dark:bg-emerald-500/10 dark:ring-emerald-500/20">
+        <svg viewBox="0 0 24 24" className="size-5 text-emerald-700 dark:text-emerald-400" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M12 3v12" />
           <path d="m7 10 5 5 5-5" />
           <path d="M4 20h16" />
@@ -58,8 +68,8 @@ const summaryCards: SummaryCard[] = [
     trend: "up",
     trendLabel: "+3% dari minggu lalu",
     icon: (
-      <div className="flex size-10 items-center justify-center rounded-lg bg-indigo-50 ring-1 ring-inset ring-indigo-200">
-        <svg viewBox="0 0 24 24" className="size-5 text-indigo-700" fill="none" stroke="currentColor" strokeWidth="2">
+      <div className="flex size-10 items-center justify-center rounded-lg bg-indigo-50 ring-1 ring-inset ring-indigo-200 dark:bg-indigo-500/10 dark:ring-indigo-500/20">
+        <svg viewBox="0 0 24 24" className="size-5 text-indigo-700 dark:text-indigo-400" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M7 7h10v10H7z" />
           <path d="M4 10V6a2 2 0 0 1 2-2h4" />
           <path d="M20 14v4a2 2 0 0 1-2 2h-4" />
@@ -74,8 +84,8 @@ const summaryCards: SummaryCard[] = [
     trendLabel: "-2% dari minggu lalu",
     emphasis: "danger",
     icon: (
-      <div className="flex size-10 items-center justify-center rounded-lg bg-orange-50 ring-1 ring-inset ring-orange-200">
-        <svg viewBox="0 0 24 24" className="size-5 text-orange-700" fill="none" stroke="currentColor" strokeWidth="2">
+      <div className="flex size-10 items-center justify-center rounded-lg bg-orange-50 ring-1 ring-inset ring-orange-200 dark:bg-orange-500/10 dark:ring-orange-500/20">
+        <svg viewBox="0 0 24 24" className="size-5 text-orange-700 dark:text-orange-400" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M12 9v4" />
           <path d="M12 17h.01" />
           <path d="M10.3 4.9 2.6 19.2A1.5 1.5 0 0 0 3.9 21h16.2a1.5 1.5 0 0 0 1.3-2.2L13.7 4.9a2 2 0 0 0-3.4 0Z" />
@@ -105,25 +115,36 @@ const activities: Activity[] = [
 function TrendBadge({ trend, label }: { trend: Trend; label: string }) {
   const styles =
     trend === "up"
-      ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
-      : "bg-red-50 text-red-700 ring-red-200"
+      ? "bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20"
+      : "bg-red-50 text-red-700 ring-red-200 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-500/20"
 
   return (
-    <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold ring-1 ring-inset ${styles}`}>
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-semibold ring-1 ring-inset ${styles}`}>
       {label}
     </span>
   )
 }
 
-function ActivityDot({ type }: { type: ActivityType }) {
-  const color =
-    type === "inbound"
-      ? "bg-emerald-500"
-      : type === "outbound"
-        ? "bg-indigo-500"
-        : "bg-orange-500"
-
-  return <span className={`mt-1.5 size-2.5 shrink-0 rounded-full ${color}`} />
+function ActivityIcon({ type }: { type: ActivityType }) {
+  if (type === "inbound") {
+    return (
+      <div className="flex z-10 size-7 items-center justify-center rounded-full bg-emerald-100 ring-4 ring-white dark:ring-zinc-950 dark:bg-emerald-900/50">
+        <ArrowDownToLine className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+      </div>
+    )
+  }
+  if (type === "outbound") {
+    return (
+      <div className="flex z-10 size-7 items-center justify-center rounded-full bg-indigo-100 ring-4 ring-white dark:ring-zinc-950 dark:bg-indigo-900/50">
+        <ArrowUpFromLine className="size-3.5 text-indigo-600 dark:text-indigo-400" />
+      </div>
+    )
+  }
+  return (
+    <div className="flex z-10 size-7 items-center justify-center rounded-full bg-orange-100 ring-4 ring-white dark:ring-zinc-950 dark:bg-orange-900/50">
+      <Box className="size-3.5 text-orange-600 dark:text-orange-400" />
+    </div>
+  )
 }
 
 export default function DashboardIndex() {
@@ -131,14 +152,14 @@ export default function DashboardIndex() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-          <p className="mt-1 text-sm text-gray-600">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-zinc-50">Dashboard Overview</h1>
+          <p className="mt-1 text-sm text-gray-600 dark:text-zinc-400">
             Ringkasan performa gudang dan pergerakan stok Anda hari ini.
           </p>
         </div>
         <button
           type="button"
-          className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
+          className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 transition-colors"
         >
           Hari Ini · 7 Hari Terakhir
         </button>
@@ -146,120 +167,65 @@ export default function DashboardIndex() {
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {summaryCards.map((c) => (
-          <div key={c.title} className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-            <div className="flex items-start justify-between gap-3">
+          <Card key={c.title} className="p-4 shadow-sm border-gray-200 dark:border-zinc-800 dark:bg-zinc-950 flex flex-col justify-center">
+            <div className="flex items-start gap-4">
               {c.icon}
-              <div className="flex-1">
-                <div className="text-sm font-semibold text-gray-700">{c.title}</div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold text-gray-600 dark:text-zinc-400">{c.title}</div>
                 <div
                   className={
                     c.emphasis === "danger"
-                      ? "mt-2 text-3xl font-extrabold tracking-tight text-orange-700"
-                      : "mt-2 text-3xl font-extrabold tracking-tight text-gray-900"
+                      ? "mt-1 text-3xl font-extrabold tracking-tight text-orange-700 dark:text-orange-500"
+                      : "mt-1 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-zinc-50"
                   }
                 >
                   {c.value}
                 </div>
-                <div className="mt-2">
+                <div className="mt-2.5">
                   <TrendBadge trend={c.trend} label={c.trendLabel} />
                 </div>
               </div>
             </div>
-          </div>
+          </Card>
         ))}
       </section>
 
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-            <div className="border-b border-gray-200 px-4 py-3">
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="text-sm font-semibold text-gray-900">Fast vs Slow Moving Items</h2>
-                  <p className="mt-1 text-xs text-gray-600">
-                    Mockup visual per SKU (Fast: biru, Slow: abu-abu)
-                  </p>
-                </div>
-                <div className="flex items-center gap-3 text-xs font-semibold text-gray-600">
-                  <span className="inline-flex items-center gap-2">
-                    <span className="size-2 rounded-full bg-sky-500" />
-                    Fast Moving
-                  </span>
-                  <span className="inline-flex items-center gap-2">
-                    <span className="size-2 rounded-full bg-gray-300" />
-                    Slow Moving
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4">
-              <div className="space-y-4">
-                {barRows.map((r) => (
-                  <div key={r.sku} className="grid grid-cols-12 items-center gap-3">
-                    <div className="col-span-3">
-                      <div className="text-sm font-semibold text-gray-900">{r.sku}</div>
-                      <div className="mt-0.5 text-xs text-gray-600">Pergerakan 7 hari</div>
-                    </div>
-                    <div className="col-span-9">
-                      <div className="flex h-10 items-center gap-2">
-                        <div className="flex-1 rounded-lg bg-gray-100 p-1">
-                          <div className="flex h-8 items-center gap-1.5">
-                            <div className="h-8 rounded-md bg-sky-500" style={{ width: `${r.fast}%` }} />
-                            <div className="h-8 rounded-md bg-gray-300" style={{ width: `${r.slow}%` }} />
-                          </div>
-                        </div>
-                        <div className="w-20 text-right text-xs font-semibold text-gray-700">
-                          {r.fast}/{r.slow}
-                        </div>
-                      </div>
-                      <div className="mt-1 flex items-center justify-between text-[11px] text-gray-500">
-                        <span>0</span>
-                        <span>50</span>
-                        <span>100</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-4">
-                <div className="text-sm font-semibold text-gray-900">Insight Cepat</div>
-                <div className="mt-1 text-sm text-gray-700">
-                  SKU dengan fast moving tinggi diprioritaskan untuk replenishment dan slotting dekat area picking.
-                </div>
-              </div>
-            </div>
-          </div>
+          <DashboardChart />
         </div>
 
         <div className="lg:col-span-1">
-          <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-            <div className="border-b border-gray-200 px-4 py-3">
-              <h2 className="text-sm font-semibold text-gray-900">Aktivitas Terakhir</h2>
-              <p className="mt-1 text-xs text-gray-600">Log inbound, outbound, dan pergerakan stok</p>
-            </div>
-            <div className="p-4">
-              <div className="space-y-4">
+          <Card className="h-full border-gray-200 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 flex flex-col">
+            <CardHeader className="border-b border-gray-100 dark:border-zinc-800/60 pb-4">
+              <CardTitle className="text-base font-semibold">Aktivitas Terakhir</CardTitle>
+              <CardDescription className="text-xs">Log inbound, outbound, dan pergerakan stok</CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1 pt-6 px-5 flex flex-col">
+              <div className="relative border-l border-gray-100 dark:border-zinc-800 ml-3 space-y-6 flex-1">
                 {activities.map((a, idx) => (
-                  <div key={`${a.time}-${idx}`} className="flex items-start gap-3">
-                    <ActivityDot type={a.type} />
-                    <div className="min-w-0">
-                      <div className="text-xs font-semibold text-gray-600">{a.time}</div>
-                      <div className="mt-0.5 text-sm font-semibold text-gray-900">{a.message}</div>
+                  <div key={`${a.time}-${idx}`} className="relative pl-6">
+                    <div className="absolute -left-3.5 top-0 flex items-center justify-center">
+                      <ActivityIcon type={a.type} />
+                    </div>
+                    <div className="flex flex-col min-w-0 pb-1">
+                      <div className="text-[11px] font-semibold tracking-wider uppercase text-gray-500 dark:text-zinc-500 mb-0.5">{a.time}</div>
+                      <div className="text-sm font-medium text-gray-800 dark:text-zinc-200 leading-snug">{a.message}</div>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <button
-                type="button"
-                className="mt-5 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50"
-              >
-                Lihat Semua Aktivitas
-              </button>
-            </div>
-          </div>
+              <div className="pt-6 mt-auto">
+                <button
+                  type="button"
+                  className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50 dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                >
+                  Lihat Semua Aktivitas
+                </button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section>
     </div>
