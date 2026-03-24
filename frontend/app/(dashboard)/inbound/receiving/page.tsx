@@ -1,192 +1,89 @@
 "use client";
-import { useState, useRef } from "react";
-import { toast } from "sonner";
-import { WmsService } from "@/services/wms.service";
+
+import React, { useState } from "react";
+import { BarcodeScanner } from "@/components/ui/barcode-scanner";
+import { Boxes, CheckCircle2, ArrowDownToLine } from "lucide-react";
 import { useStore } from "@/store/useStore";
-import { useMutation } from "@tanstack/react-query";
-import { Scanner } from "@yudiel/react-qr-scanner";
-import { Camera, X } from "lucide-react";
 
 export default function ReceivingPage() {
-  const tenantName = useStore((state) => state.tenantName); // Note: Should ideally be tenant_id, but using tenantName as proxy if auth isn't fully returning tenantId yet. For now let's use a dummy tenantId or the one from store.
-  // We need to fetch product list ideally, but for now we'll hardcode or use simple inputs
-  const [poNumber, setPoNumber] = useState("");
-  const [supplier, setSupplier] = useState("");
-  const [arrivalDate, setArrivalDate] = useState("");
-  const [productId, setProductId] = useState(""); // Dummy for now
-  const [quantity, setQuantity] = useState("");
-  
-  const [isScanning, setIsScanning] = useState(false);
-  const qtyInputRef = useRef<HTMLInputElement>(null);
-  const productIdInputRef = useRef<HTMLInputElement>(null);
+  const role = useStore((state) => state.role);
+  const [scannedSku, setScannedSku] = useState<string | null>(null);
 
-  const handleBarcodeGunScan = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      qtyInputRef.current?.focus();
+  // RBAC Proteksi Route Dasar beserta fallback (admin / operator) untuk user yang localStorage-nya belum keraseret ke enum baru
+  const isAllowed = ['SUPER_ADMIN', 'TENANT_ADMIN', 'PURCHASING', 'WAREHOUSE_OPERATOR', 'admin', 'operator'].includes(role);
+
+  if (!isAllowed) {
+    return (
+      <div className="p-8 max-w-lg mx-auto text-center mt-20 border border-red-200 bg-red-50 rounded-xl">
+        <h2 className="text-2xl font-bold text-red-600 mb-2">Akses Ditolak (403)</h2>
+        <p className="text-red-700">Halaman ini hanya dapat diakses oleh Tim Gudang (Warehouse Operator) atau Admin.</p>
+      </div>
+    );
+  }
+
+  const handleScanSuccess = (decodedText: string) => {
+    // Bunyikan suara beep jika di HP (opsional)
+    if (typeof window !== "undefined" && window.navigator && window.navigator.vibrate) {
+      window.navigator.vibrate(200);
     }
-  };
-
-  const receivingMutation = useMutation({
-    mutationFn: WmsService.receiving,
-    onSuccess: () => {
-      toast.success("Data penerimaan barang (Receiving) berhasil disimpan!");
-      setPoNumber("");
-      setSupplier("");
-      setArrivalDate("");
-      setProductId("");
-      setQuantity("");
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || error.message || "Terjadi kesalahan saat menyimpan");
-    }
-  });
-
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!productId || !quantity) {
-      toast.error("Product ID dan Quantity wajib diisi");
-      return;
-    }
-    // Asumsikan kita punya tenant_id di localStorage atau dari user object.
-    // Karena saat ini login tidak menyimpan tenantId secara eksplisit di store, 
-    // kita gunakan "dummy-tenant" atau tenantName untuk keperluan demo.
-    const tenant_id = localStorage.getItem("tenant_id") || "T-001"; // Sebaiknya ambil dari auth user info
-
-    receivingMutation.mutate({
-      tenant_id,
-      product_id: productId,
-      quantity: Number(quantity),
-      po_number: poNumber,
-      supplier_name: supplier,
-      arrival_date: arrivalDate,
-      inspection_status: "GOOD",
-      unloading_status: "DONE"
-    });
+    setScannedSku(decodedText);
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="p-6 md:p-8 max-w-4xl mx-auto space-y-6">
+      <div className="flex items-center gap-3">
+        <div className="p-3 bg-blue-100 text-blue-600 rounded-lg">
+          <ArrowDownToLine className="w-6 h-6" />
+        </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-zinc-50">Receiving (Barang Masuk)</h1>
-          <p className="text-gray-500 dark:text-zinc-400 text-sm">Catat penerimaan barang dari PO atau Supplier.</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-zinc-100">Penerimaan Barang (Inbound)</h1>
+          <p className="text-sm text-gray-500 dark:text-zinc-400">Scan barcode atau QR Code untuk menerima persediaan ke Gudang secara otomatis.</p>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-zinc-950 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-zinc-800">
-        <form onSubmit={handleSave} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-1">Nomor PO / Surat Jalan</label>
-              <input 
-                type="text" 
-                value={poNumber}
-                onChange={(e) => setPoNumber(e.target.value)}
-                className="w-full p-2.5 border border-gray-300 dark:border-zinc-700 rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500" 
-                placeholder="Contoh: PO-202310..." 
-                required 
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-1">Supplier / Pengirim</label>
-              <input 
-                type="text" 
-                value={supplier}
-                onChange={(e) => setSupplier(e.target.value)}
-                className="w-full p-2.5 border border-gray-300 dark:border-zinc-700 rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500" 
-                placeholder="Nama PT/Supplier" 
-                required 
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-1">Tanggal Terima</label>
-              <input 
-                type="date" 
-                value={arrivalDate}
-                onChange={(e) => setArrivalDate(e.target.value)}
-                className="w-full p-2.5 border border-gray-300 dark:border-zinc-700 rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none dark:bg-zinc-900 dark:text-zinc-100" 
-                required 
-              />
-            </div>
-          </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <BarcodeScanner 
+            title="Kamera Scanner (Operator)" 
+            onScanSuccess={handleScanSuccess} 
+          />
+        </div>
 
-          <div className="border border-gray-200 dark:border-zinc-800 rounded-lg overflow-hidden">
-            <div className="bg-gray-50 dark:bg-zinc-900/50 p-3 border-b border-gray-200 dark:border-zinc-800 flex justify-between items-center">
-              <h3 className="font-semibold text-gray-700 dark:text-zinc-300">Detail Item Diterima</h3>
-            </div>
-            <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-1">Product ID (SKU UUID) atau Barcode</label>
-                <div className="flex gap-2">
-                  <input 
-                    type="text" 
-                    ref={productIdInputRef}
-                    value={productId}
-                    onKeyDown={handleBarcodeGunScan}
-                    onChange={(e) => setProductId(e.target.value)}
-                    className="w-full p-2.5 border border-gray-300 dark:border-zinc-700 rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500" 
-                    placeholder="Scan fisik / ketik ID" 
-                    required 
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setIsScanning(!isScanning)}
-                    className="p-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 font-medium rounded-md transition border border-gray-300 dark:border-zinc-700"
-                    title={isScanning ? "Tutup Kamera" : "Scan via WebCam"}
-                  >
-                    {isScanning ? <X className="size-5" /> : <Camera className="size-5" />}
-                  </button>
+        <div className="bg-white dark:bg-zinc-900 border dark:border-zinc-800 rounded-xl p-6 shadow-sm flex flex-col justify-start">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-锌-100 mb-4 border-b pb-2">Informasi Scan</h3>
+          
+          {scannedSku ? (
+            <div className="space-y-4">
+              <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg flex gap-3 text-emerald-800 dark:text-emerald-300">
+                <CheckCircle2 className="w-5 h-5 shrink-0" />
+                <div>
+                  <p className="font-semibold text-sm">SKU Berhasil Dipindai</p>
+                  <p className="text-xl font-mono mt-1 font-bold">{scannedSku}</p>
                 </div>
-                {isScanning && (
-                  <div className="mt-3 aspect-video overflow-hidden rounded-md border-2 border-dashed border-gray-300 dark:border-zinc-700 bg-black relative">
-                    <Scanner
-                      onScan={(result) => {
-                        if (result && result.length > 0) {
-                          const code = result[0].rawValue;
-                          setProductId(code);
-                          setIsScanning(false);
-                          toast.success(`Berhasil memindai: ${code}`);
-                          // Focus directly shifts to Quantity field
-                          setTimeout(() => qtyInputRef.current?.focus(), 150);
-                        }
-                      }}
-                      onError={(e) => console.debug("Scanner err:", e)}
-                    />
-                    <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                      Arahkan kamera ke QR/Barcode
-                    </div>
-                  </div>
-                )}
-                <p className="text-xs text-gray-500 dark:text-zinc-500 mt-1">Gunakan scanner fisik atau klik ikon kamera</p>
               </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-1">Quantity Diterima</label>
-                <input 
-                  type="number" 
-                  ref={qtyInputRef}
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  className="w-full p-2.5 border border-gray-300 dark:border-zinc-700 rounded-md focus:ring-blue-500 focus:border-blue-500 outline-none dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500" 
-                  placeholder="Jumlah aktual" 
-                  min="1"
-                  required 
-                />
+
+              {/* Form simulasi put-away otomatis */}
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase">Input Kuantitas (Qty)</label>
+                  <input type="number" defaultValue="1" className="w-full mt-1 px-4 py-2 border rounded-md dark:bg-zinc-800 dark:border-zinc-700 focus:ring-2 focus:ring-blue-500 outline-none" />
+                </div>
+                <button className="w-full py-2.5 bg-gray-900 dark:bg-zinc-100 dark:text-zinc-900 text-white rounded-md font-semibold mt-4 shadow hover:bg-gray-800 transition-colors">
+                  Konfirmasi Pemasukan Database
+                </button>
+                <button onClick={() => setScannedSku(null)} className="w-full py-2 text-sm text-gray-500 hover:text-gray-800 transition-colors">
+                  Reset & Scan Ulang
+                </button>
               </div>
             </div>
-          </div>
-
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-300 font-medium rounded-md transition">Batal</button>
-            <button 
-              type="submit" 
-              disabled={receivingMutation.isPending}
-              className="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition disabled:opacity-50"
-            >
-              {receivingMutation.isPending ? "Menyimpan..." : "Simpan & Generate Put-Away"}
-            </button>
-          </div>
-        </form>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-8 rounded-lg outline-dashed outline-2 outline-gray-200 dark:outline-zinc-800 outline-offset-4">
+              <Boxes className="w-12 h-12 text-gray-300 dark:text-zinc-700 mb-3" />
+              <p className="text-gray-500 dark:text-zinc-400 font-medium">Belum ada item yang di-scan.</p>
+              <p className="text-xs text-gray-400 mt-1">Arahkan kamera ke barcode produk fisik Anda.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

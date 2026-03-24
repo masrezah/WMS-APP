@@ -1,0 +1,27 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma\schema.prisma.
+
+Error: Prisma schema validation - (validate wasm)
+Error code: P1012
+error: Error validating field `tenant` in model `AuditLog`: The relation field `tenant` on model `AuditLog` is missing an opposite relation field on the model `Tenant`. Either run `prisma format` or add it manually.
+  -->  prisma\schema.prisma:166
+   | 
+165 | 
+166 |   tenant Tenant @relation(fields: [tenant_id], references: [id])
+
+167 |   user   User   @relation(fields: [user_id], references: [id])
+   | 
+error: Error validating field `user` in model `AuditLog`: The relation field `user` on model `AuditLog` is missing an opposite relation field on the model `User`. Either run `prisma format` or add it manually.
+  -->  prisma\schema.prisma:167
+   | 
+166 |   tenant Tenant @relation(fields: [tenant_id], references: [id])
+167 |   user   User   @relation(fields: [user_id], references: [id])
+
+168 | 
+   | 
+
+Validation Error Count: 2
+[Context: validate]
+
+Prisma CLI Version : 7.5.0

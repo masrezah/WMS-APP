@@ -9,11 +9,11 @@ datasource db {
 // --- ENUMS ---
 
 enum Role {
-  SUPER_ADMIN 
-  TENANT_ADMIN 
+  SUPER_ADMIN
+  TENANT_ADMIN
   PURCHASING
   RESOURCES
-  WAREHOUSE_OPERATOR 
+  WAREHOUSE_OPERATOR
   FINANCE
   PRODUCTION
   SHIPMENT
@@ -31,7 +31,13 @@ enum ProductCategory {
 enum TransactionType {
   INBOUND
   OUTBOUND
-  ADJUSTMENT 
+  ADJUSTMENT
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
 }
 
 // --- MODELS ---
@@ -47,19 +53,21 @@ model Tenant {
   warehouses   Warehouse[]
   batches      InventoryBatch[]
   transactions TransactionLog[]
+  auditLogs    AuditLog[]
 }
 
 model User {
   id         String   @id @default(uuid())
-  tenant_id  String 
+  tenant_id  String
   email      String   @unique
-  password   String 
+  password   String
   name       String
   role       Role     @default(WAREHOUSE_OPERATOR)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  tenant Tenant @relation(fields: [tenant_id], references: [id])
+  tenant    Tenant     @relation(fields: [tenant_id], references: [id])
+  auditLogs AuditLog[]
 
   @@index([tenant_id])
 }
@@ -67,10 +75,10 @@ model User {
 model Product {
   id         String          @id @default(uuid())
   tenant_id  String
-  sku        String 
+  sku        String
   name       String
   category   ProductCategory
-  unit       String          // Pcs, Box, Kg, dll
+  unit       String // Pcs, Box, Kg, dll
   created_at DateTime        @default(now())
   updated_at DateTime        @updatedAt
 
@@ -78,18 +86,18 @@ model Product {
   batches      InventoryBatch[]
   transactions TransactionLog[]
 
-  @@unique([tenant_id, sku]) 
+  @@unique([tenant_id, sku])
   @@index([tenant_id])
 }
 
 model Warehouse {
-  id          String     @id @default(uuid())
+  id          String  @id @default(uuid())
   tenant_id   String
   name        String
-  type        String     @default("Private") 
-  method      String     @default("FIFO") 
-  layout_type String     @default("Garis Lurus Sederhana") 
-  address     String?    
+  type        String  @default("Private")
+  method      String  @default("FIFO")
+  layout_type String  @default("Garis Lurus Sederhana")
+  address     String?
 
   tenant    Tenant     @relation(fields: [tenant_id], references: [id])
   locations Location[]
@@ -100,10 +108,10 @@ model Warehouse {
 model Location {
   id           String @id @default(uuid())
   warehouse_id String
-  zone         String   // Zone A, Zone B
-  rack         String   // Baris Rak
-  shelf        String   // Level Rak
-  bin          String   // Kode Palet/Bin
+  zone         String // Zone A, Zone B
+  rack         String // Baris Rak
+  shelf        String // Level Rak
+  bin          String // Kode Palet/Bin
 
   warehouse Warehouse        @relation(fields: [warehouse_id], references: [id])
   batches   InventoryBatch[]
@@ -111,14 +119,14 @@ model Location {
 
 model InventoryBatch {
   id            String    @id @default(uuid())
-  tenant_id     String 
+  tenant_id     String
   product_id    String
-  location_id   String 
+  location_id   String
   quantity      Int
-  batch_no      String?   
-  entry_date    DateTime  @default(now()) 
-  expiry_date   DateTime? 
-  cost_per_unit Decimal 
+  batch_no      String?
+  entry_date    DateTime  @default(now())
+  expiry_date   DateTime?
+  cost_per_unit Decimal
 
   tenant       Tenant           @relation(fields: [tenant_id], references: [id])
   product      Product          @relation(fields: [product_id], references: [id])
@@ -135,8 +143,8 @@ model TransactionLog {
   product_id String
   batch_id   String?
   type       TransactionType
-  quantity   Int 
-  notes      String? 
+  quantity   Int
+  notes      String?
   created_at DateTime        @default(now())
 
   tenant  Tenant          @relation(fields: [tenant_id], references: [id])
@@ -145,4 +153,21 @@ model TransactionLog {
 
   @@index([tenant_id])
   @@index([product_id])
+}
+
+model AuditLog {
+  id         String      @id @default(uuid())
+  tenant_id  String
+  user_id    String
+  action     AuditAction
+  entity     String // Nama tabel, misal: 'Product', 'InventoryBatch'
+  old_data   Json? // Data sebelum diubah
+  new_data   Json? // Data setelah diubah
+  created_at DateTime    @default(now())
+
+  tenant Tenant @relation(fields: [tenant_id], references: [id])
+  user   User   @relation(fields: [user_id], references: [id])
+
+  @@index([tenant_id])
+  @@index([user_id])
 }

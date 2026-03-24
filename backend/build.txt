@@ -1,0 +1,17 @@
+
+> backend@0.0.1 build
+> nest build
+
+src/common/interceptors/audit.interceptor.ts:43:17 - error TS2322: Type '{ _info: string; } | null' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+  Type 'null' is not assignable to type 'NullableJsonNullValueInput | InputJsonValue | undefined'.
+
+43                 old_data: action === 'UPDATE' ? { _info: "Old data structure required fetching before update" } : null,
+                   ~~~~~~~~
+
+  node_modules/.prisma/client/index.d.ts:12445:5
+    12445     old_data?: NullableJsonNullValueInput | InputJsonValue
+              ~~~~~~~~
+    The expected type comes from property 'old_data' which is declared here on type '(Without<AuditLogCreateInput, AuditLogUncheckedCreateInput> & AuditLogUncheckedCreateInput) | (Without<...> & AuditLogCreateInput)'
+
+Found 1 error(s).
+
